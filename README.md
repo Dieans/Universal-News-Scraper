@@ -1,4 +1,4 @@
-# 🌍 Universal News Scraper v4.0
+# 🌍 Universal News Scraper v4.1
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -17,11 +17,23 @@ A powerful, terminal-based news aggregator that supports **RSS feeds**, **Web Sc
 | 🕵️ **Auto-Discovery** | Find news on ANY topic (Crypto, Sports, Politics, AI) without knowing the URL |
 | 📂 **Preset Categories** | 6 built-in categories with 30+ international news sources |
 | 🛡️ **Anti-Blocking** | Random User-Agent rotation to bypass restrictions |
-| 💾 **Dual Export** | Save results as CSV, JSON, or both |
-| 🎨 **Modern UI** | Beautiful terminal interface powered by the `Rich` library |
+| 💾 **Multi-Format Export** | Save results as CSV, JSON, HTML, or ALL formats |
+| 🎨 **HTML Reports** | Beautiful dark-themed HTML reports with article cards |
+| 🔇 **Noise Filter** | Automatically filters out generic Bing category entries |
+| 🔗 **Real URL Extraction** | Extracts actual article URLs from Bing redirects |
 | 📅 **Date Filtering** | Only get articles from a specific date onwards |
 | 🔑 **Keyword Filtering** | Filter articles by multiple keywords |
 | 🔄 **Settings Memory** | Remembers your last configuration for quick re-runs |
+
+---
+
+## 🆕 What's New in v4.1
+
+- 🌐 **HTML Export** - Beautiful dark-themed HTML reports
+- 🔇 **Enhanced Noise Filter** - Filters generic Bing entries (Top stories, Entertainment, etc.)
+- 🔗 **Real URL Extraction** - Extracts actual article URLs from Bing redirects
+- 📰 **Real Source Detection** - Shows the actual news source instead of "Bing"
+- 📤 **4 Export Options** - CSV, JSON, HTML, or All formats
 
 ---
 
@@ -79,7 +91,7 @@ python scraper.py
 
 ```
 ╭─────────────────────────────────────────╮
-│  🌍 UNIVERSAL NEWS SCRAPER v4.0         │
+│  🌍 UNIVERSAL NEWS SCRAPER v4.1         │
 │  Powered by Python & Bing RSS           │
 ╰─────────────────────────────────────────╯
 
@@ -92,21 +104,15 @@ python scraper.py
 └────────────────────────────────────────────┘
 ```
 
-### Option 3: Auto-Discover by Topic (Recommended)
+### Export Format Options
 
-1. Enter any topic (e.g., `Bitcoin`, `AI`, `Elections`, `Sports`)
-2. The scraper generates a Bing News RSS feed automatically
-3. Optionally add keyword filters
-4. Set date filter (optional)
-5. Choose export format (CSV/JSON/Both)
-6. Results are saved automatically!
-
-### Option 4: Preset Sources
-
-1. Select a category (International, Sports, Tech, etc.)
-2. Choose specific sources or select ALL
-3. Add keyword filters (optional)
-4. Export results
+```
+📤 Export Format:
+  [1] CSV only
+  [2] JSON only
+  [3] HTML only      ← Beautiful dark-themed report!
+  [4] All formats    ← CSV + JSON + HTML
+```
 
 ---
 
@@ -116,7 +122,7 @@ python scraper.py
 
 ```csv
 title,url,date,description,source,matched_keywords
-"AI Revolution in 2026...",https://...,2026-01-20,"Artificial intelligence...",Techcrunch,"AI, technology"
+"AI Revolution in 2026...",https://techcrunch.com/...,2026-01-20,"Description...",Techcrunch,"AI, technology"
 ```
 
 ### JSON Output (`results.json`)
@@ -125,14 +131,23 @@ title,url,date,description,source,matched_keywords
 [
   {
     "title": "AI Revolution in 2026...",
-    "url": "https://...",
+    "url": "https://techcrunch.com/...",
     "date": "2026-01-20",
-    "description": "Artificial intelligence...",
+    "description": "Description...",
     "source": "Techcrunch",
     "matched_keywords": "AI, technology"
   }
 ]
 ```
+
+### HTML Output (`results.html`)
+
+Beautiful dark-themed report with:
+- 📊 Stats header showing article count
+- 📰 Article cards with hover effects
+- 🏷️ Keyword badges
+- 🔗 Clickable links to original articles
+- 📱 Responsive design
 
 ---
 
@@ -157,25 +172,10 @@ Universal-News-Scraper/
 ├── scraper.py           # Main application
 ├── sources.json         # Preset RSS sources (editable)
 ├── requirements.txt     # Python dependencies
-├── .scraper_config.json # Auto-saved settings
+├── .scraper_config.json # Auto-saved settings (ignored by git)
+├── .gitignore           # Git ignore file
+├── LICENSE              # MIT License
 └── README.md            # This file
-```
-
----
-
-## ⚙️ Configuration
-
-The scraper automatically saves your settings to `.scraper_config.json`:
-
-```json
-{
-  "urls": ["https://techcrunch.com/feed/"],
-  "keywords": ["AI", "startup"],
-  "start_date": "2026-01-01",
-  "output_file": "tech_news",
-  "export_format": "both",
-  "last_run": "2026-01-20 10:30:00"
-}
 ```
 
 ---
@@ -188,25 +188,19 @@ The scraper automatically saves your settings to `.scraper_config.json`:
 Select option: 3
 Enter topic: Bitcoin
 Keywords: (empty for all)
-Export format: Both
-→ Saves bitcoin_news.csv and bitcoin_news.json
+Export format: 4 (All)
+→ Saves bitcoin_news.csv, bitcoin_news.json, bitcoin_news.html
 ```
 
-### Example 2: Scrape All Cybersecurity Sources
+### Example 2: Scrape Cybersecurity Sources
 
 ```
 Select option: 4
 Select category: 4 (Cybersecurity)
 Select sources: A (ALL)
-Keywords: ransomware, CVE
-→ Filters articles containing "ransomware" or "CVE"
-```
-
-### Example 3: Quick Re-run
-
-```
-Select option: 1
-→ Uses your previous settings instantly
+Keywords: ransomware
+Export format: 3 (HTML)
+→ Generates beautiful HTML report
 ```
 
 ---
@@ -229,20 +223,21 @@ MIT License - Feel free to use and modify!
 
 ## 🔄 Changelog
 
-### v4.0 (Current)
+### v4.1 (Current)
+- 🌐 Added **HTML Export** with dark theme
+- 🔇 Enhanced **Noise Filter** for Bing RSS
+- 🔗 **Real URL Extraction** from Bing redirects
+- 📰 **Real Source Detection** (shows actual source, not "Bing")
+- 📤 4 export options (CSV, JSON, HTML, All)
+
+### v4.0
 - 🎨 Complete UI rebrand - "Universal News Scraper"
-- 🌐 Switched from Google Search to **Bing News RSS** (no rate limits!)
+- 🌐 Switched from Google Search to **Bing News RSS**
 - 📂 6 international preset categories with 30+ sources
-- 🗑️ Removed deprecated dependencies
-- 📖 Updated documentation
 
 ### v3.0
 - Added Topic Discovery via Google Search
 - Cybersecurity-focused preset sources
-
-### v2.0
-- Initial release with RSS/HTML scraping
-- Keyword and date filtering
 
 ---
 

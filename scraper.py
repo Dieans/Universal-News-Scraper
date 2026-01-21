@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Universal News Scraper v4.0
+Universal News Scraper v4.1
 Aggregate news from multiple sources + Topic Discovery
 Powered by Python & Bing RSS
 """
@@ -13,7 +13,7 @@ import hashlib
 import time
 import re
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs, unquote
 from pathlib import Path
 
 import requests
@@ -149,15 +149,75 @@ class NewsScraper:
         """Generate a hash for URL deduplication."""
         return hashlib.md5(url.encode()).hexdigest()
     
+    def extract_real_url(self, bing_url: str) -> str:
+        """Extract the real article URL from Bing apiclick redirect URL."""
+        if "apiclick.aspx" in bing_url:
+            try:
+                parsed = urlparse(bing_url)
+                params = parse_qs(parsed.query)
+                if "url" in params:
+                    real_url = unquote(params["url"][0])
+                    return real_url
+            except:
+                pass
+        return bing_url
+    
+    def get_source_from_url(self, url: str) -> str:
+        """Extract clean source name from URL."""
+        try:
+            # First extract real URL if it's a Bing redirect
+            real_url = self.extract_real_url(url)
+            parsed = urlparse(real_url)
+            domain = parsed.netloc.replace("www.", "")
+            # Get first part of domain
+            name = domain.split(".")[0].title()
+            return name if name else "Unknown"
+        except:
+            return "Unknown"
+    
     def scrape_rss(self, url: str, content: str, keywords: list, start_date: datetime) -> list:
         """Parse RSS feed and extract articles."""
         articles = []
         feed = feedparser.parse(content)
         
+        # Noise filter patterns for Bing RSS
+        NOISE_TITLES = [
+            "Top stories", "Entertainment", "Sports", "Business", "World",
+            "Politics", "Science", "Technology", "Health", "Lifestyle",
+            "Local", "Opinion", "Video", "Photos", "More stories"
+        ]
+        NOISE_URL_PATTERNS = [
+            "bing.com/news/search?q=",
+            "bing.com/search?",
+            "bing.com/news?q=Top",
+            "bing.com/news?q=Entertainment",
+            "bing.com/news?q=Sports"
+        ]
+        
         for entry in feed.entries:
             try:
                 title = entry.get("title", "No Title")
                 link = entry.get("link", "")
+                
+                # ===== ENHANCED NOISE FILTER =====
+                # Skip very short titles (likely noise)
+                if len(title.strip()) < 10:
+                    continue
+                
+                # Skip generic Bing category titles
+                if any(noise.lower() == title.lower().strip() for noise in NOISE_TITLES):
+                    continue
+                
+                # STRICT FILTER: For Bing URLs, only keep real article redirects
+                if "bing.com" in link:
+                    # Only keep URLs with apiclick.aspx (real article redirects)
+                    if "apiclick.aspx" not in link:
+                        continue
+                
+                # Skip any remaining Bing search URLs
+                if any(pattern in link for pattern in NOISE_URL_PATTERNS):
+                    continue
+                # =================================
                 
                 # Skip if already seen
                 url_hash = self.get_url_hash(link)
@@ -191,12 +251,20 @@ class NewsScraper:
                 
                 if matched_keywords:
                     self.seen_urls.add(url_hash)
+                    
+                    # Extract real URL and source from Bing redirect
+                    real_url = self.extract_real_url(link)
+                    real_source = self.get_source_from_url(link)
+                    
+                    # Clean description (remove extra whitespace)
+                    clean_desc = " ".join(description.split())
+                    
                     articles.append({
-                        "title": title,
-                        "url": link,
+                        "title": title.strip(),
+                        "url": real_url,
                         "date": pub_date.strftime("%Y-%m-%d") if pub_date else "Unknown",
-                        "description": description,
-                        "source": self.get_source_name(url),
+                        "description": clean_desc,
+                        "source": real_source,
                         "matched_keywords": ", ".join(matched_keywords)
                     })
             except Exception as e:
@@ -481,14 +549,179 @@ def save_config(config: dict):
         pass
 
 
+def export_html(results: list, filename: str):
+    """Export results to a beautiful HTML report."""
+    if not results:
+        return
+    
+    html_template = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Report - {title}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e4e4e7;
+            padding: 20px;
+        }}
+        .container {{ max-width: 1200px; margin: 0 auto; }}
+        .header {{
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #0f3460 0%, #533483 100%);
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }}
+        .header h1 {{ font-size: 2.5rem; margin-bottom: 10px; }}
+        .header .emoji {{ font-size: 3rem; }}
+        .stats {{
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }}
+        .stat {{
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }}
+        .stat-value {{ font-size: 2rem; font-weight: bold; color: #22d3ee; }}
+        .stat-label {{ font-size: 0.9rem; color: #a1a1aa; }}
+        .articles {{ display: grid; gap: 20px; }}
+        .article {{
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #22d3ee;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }}
+        .article:hover {{
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(34,211,238,0.2);
+        }}
+        .article-title {{
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #f4f4f5;
+        }}
+        .article-title a {{
+            color: inherit;
+            text-decoration: none;
+        }}
+        .article-title a:hover {{ color: #22d3ee; }}
+        .article-meta {{
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            margin-bottom: 12px;
+        }}
+        .article-meta span {{ display: flex; align-items: center; gap: 5px; }}
+        .article-desc {{
+            color: #d4d4d8;
+            line-height: 1.6;
+        }}
+        .keywords {{
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }}
+        .keyword {{
+            background: rgba(34,211,238,0.2);
+            color: #22d3ee;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }}
+        .footer {{
+            text-align: center;
+            padding: 30px;
+            color: #71717a;
+            font-size: 0.9rem;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="emoji">🌍</div>
+            <h1>Universal News Scraper</h1>
+            <p>News Report - Generated {date}</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">{count}</div>
+                    <div class="stat-label">Articles Found</div>
+                </div>
+            </div>
+        </div>
+        <div class="articles">
+            {articles_html}
+        </div>
+        <div class="footer">
+            Generated by Universal News Scraper v4.1 | Powered by Python & Bing RSS
+        </div>
+    </div>
+</body>
+</html>'''
+
+    article_template = '''<div class="article">
+    <h2 class="article-title"><a href="{url}" target="_blank">{title}</a></h2>
+    <div class="article-meta">
+        <span>📅 {date}</span>
+        <span>📰 {source}</span>
+    </div>
+    <p class="article-desc">{description}</p>
+    <div class="keywords">
+        {keywords_html}
+    </div>
+</div>'''
+
+    articles_html = ""
+    for article in results:
+        keywords_html = "".join(
+            f'<span class="keyword">{kw.strip()}</span>' 
+            for kw in article.get("matched_keywords", "").split(",") 
+            if kw.strip() and kw.strip() != "*"
+        )
+        articles_html += article_template.format(
+            title=article.get("title", "No Title"),
+            url=article.get("url", "#"),
+            date=article.get("date", "Unknown"),
+            source=article.get("source", "Unknown"),
+            description=article.get("description", "")[:250] + "..." if article.get("description") else "",
+            keywords_html=keywords_html
+        )
+    
+    html_content = html_template.format(
+        title=filename,
+        date=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        count=len(results),
+        articles_html=articles_html
+    )
+    
+    html_file = f"{Path(filename).stem}.html"
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(html_content)
+    
+    console.print(f"  [green]🌐 HTML saved: {html_file}[/green]")
+
+
 def export_results(results: list, filename: str, export_format: str):
-    """Export results to CSV and/or JSON."""
+    """Export results to CSV, JSON, and/or HTML."""
     if not results:
         return
     
     base_name = Path(filename).stem
     
-    if export_format in ["csv", "both"]:
+    if export_format in ["csv", "both", "all"]:
         csv_file = f"{base_name}.csv"
         with open(csv_file, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=results[0].keys())
@@ -496,18 +729,21 @@ def export_results(results: list, filename: str, export_format: str):
             writer.writerows(results)
         console.print(f"  [green]📄 CSV saved: {csv_file}[/green]")
     
-    if export_format in ["json", "both"]:
+    if export_format in ["json", "both", "all"]:
         json_file = f"{base_name}.json"
         with open(json_file, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=2, ensure_ascii=False)
         console.print(f"  [green]📋 JSON saved: {json_file}[/green]")
+    
+    if export_format in ["html", "all"]:
+        export_html(results, filename)
 
 
 def show_banner():
     """Display the application header."""
     console.print()
     console.print(Panel(
-        "[bold white]🌍 UNIVERSAL NEWS SCRAPER[/bold white] [dim]v4.0[/dim]\n\n"
+        "[bold white]🌍 UNIVERSAL NEWS SCRAPER[/bold white] [dim]v4.1[/dim]\n\n"
         "[dim]Aggregate news from any topic • RSS Feeds • Web Scraping[/dim]\n"
         "[dim cyan]Powered by Python & Bing RSS[/dim cyan]",
         style="blue",
@@ -606,7 +842,7 @@ def run_topic_discovery():
     ))
     
     # Get topic with examples
-    console.print("[dim]Examples: Bitcoin, AI, Elections, Sports, Olympiacos, Technology[/dim]")
+    console.print("[dim]Examples: Bitcoin, AI, Elections, Sports, Technology[/dim]")
     topic = Prompt.ask("\n[cyan]🔍 Enter your topic[/cyan]", default="Technology")
     
     # Generate Bing News RSS URL
@@ -646,10 +882,11 @@ def run_topic_discovery():
     console.print("\n[bold yellow]📤 Export Format:[/bold yellow]")
     console.print("  [1] CSV only")
     console.print("  [2] JSON only")
-    console.print("  [3] Both CSV + JSON\n")
+    console.print("  [3] HTML only")
+    console.print("  [4] All formats (CSV + JSON + HTML)\n")
     
-    fmt_choice = Prompt.ask("[cyan]Choose format[/cyan]", choices=["1", "2", "3"], default="3")
-    export_format = {"1": "csv", "2": "json", "3": "both"}[fmt_choice]
+    fmt_choice = Prompt.ask("[cyan]Choose format[/cyan]", choices=["1", "2", "3", "4"], default="4")
+    export_format = {"1": "csv", "2": "json", "3": "html", "4": "all"}[fmt_choice]
     
     # Return RSS URL as list for compatibility with scraper.run()
     return [bing_rss_url], topic, keywords, start_date, output_file, export_format
@@ -799,10 +1036,11 @@ def main():
         console.print("\n[bold yellow]📤 Export Format:[/bold yellow]")
         console.print("  [1] CSV only")
         console.print("  [2] JSON only")
-        console.print("  [3] Both CSV + JSON\n")
+        console.print("  [3] HTML only")
+        console.print("  [4] All formats (CSV + JSON + HTML)\n")
         
-        fmt_choice = Prompt.ask("[cyan]Choose format[/cyan]", choices=["1", "2", "3"], default="3")
-        export_format = {"1": "csv", "2": "json", "3": "both"}[fmt_choice]
+        fmt_choice = Prompt.ask("[cyan]Choose format[/cyan]", choices=["1", "2", "3", "4"], default="4")
+        export_format = {"1": "csv", "2": "json", "3": "html", "4": "all"}[fmt_choice]
     
     # Save configuration
     new_config = {
