@@ -1,0 +1,48 @@
+{
+  "categories": {
+    "📰 International News": [
+      {"name": "📰 BBC News", "url": "http://feeds.bbci.co.uk/news/rss.xml"},
+      {"name": "📰 CNN", "url": "http://rss.cnn.com/rss/edition.rss"},
+      {"name": "📰 Reuters", "url": "https://www.reutersagency.com/feed/"},
+      {"name": "📰 Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml"},
+      {"name": "📰 The Guardian", "url": "https://www.theguardian.com/world/rss"},
+      {"name": "📰 NPR News", "url": "https://feeds.npr.org/1001/rss.xml"}
+    ],
+    "⚽ Sports": [
+      {"name": "⚽ ESPN", "url": "https://www.espn.com/espn/rss/news"},
+      {"name": "⚽ BBC Sport", "url": "http://feeds.bbci.co.uk/sport/rss.xml"},
+      {"name": "⚽ Sky Sports", "url": "https://www.skysports.com/rss/12040"},
+      {"name": "⚽ Bleacher Report", "url": "https://bleacherreport.com/articles/feed"}
+    ],
+    "💻 Tech & Science": [
+      {"name": "💻 TechCrunch", "url": "https://techcrunch.com/feed/"},
+      {"name": "💻 The Verge", "url": "https://www.theverge.com/rss/index.xml"},
+      {"name": "💻 Wired", "url": "https://www.wired.com/feed/rss"},
+      {"name": "💻 Ars Technica", "url": "https://feeds.arstechnica.com/arstechnica/index"},
+      {"name": "🔬 Science Daily", "url": "https://www.sciencedaily.com/rss/all.xml"},
+      {"name": "🚀 Space.com", "url": "https://www.space.com/feeds/all"}
+    ],
+    "🔒 Cybersecurity": [
+      {"name": "🔥 The Hacker News", "url": "https://feeds.feedburner.com/TheHackersNews"},
+      {"name": "💻 Bleeping Computer", "url": "https://www.bleepingcomputer.com/feed/"},
+      {"name": "🛡️ Security Week", "url": "https://www.securityweek.com/feed/"},
+      {"name": "🔒 Krebs on Security", "url": "https://krebsonsecurity.com/feed/"},
+      {"name": "📰 Dark Reading", "url": "https://www.darkreading.com/rss.xml"},
+      {"name": "🌐 Naked Security", "url": "https://nakedsecurity.sophos.com/feed/"}
+    ],
+    "💰 Business & Finance": [
+      {"name": "💰 Bloomberg", "url": "https://feeds.bloomberg.com/markets/news.rss"},
+      {"name": "💰 CNBC", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html"},
+      {"name": "💰 Financial Times", "url": "https://www.ft.com/rss/home"},
+      {"name": "₿ CoinDesk", "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"},
+      {"name": "₿ CoinTelegraph", "url": "https://cointelegraph.com/rss"}
+    ],
+    "🎬 Entertainment": [
+      {"name": "🎬 Variety", "url": "https://variety.com/feed/"},
+      {"name": "🎬 Hollywood Reporter", "url": "https://www.hollywoodreporter.com/feed/"},
+      {"name": "🎬 Entertainment Weekly", "url": "https://ew.com/feed/"},
+      {"name": "🎮 IGN", "url": "https://feeds.feedburner.com/ign/all"},
+      {"name": "🎮 Kotaku", "url": "https://kotaku.com/rss"}
+    ]
+  }
+}
