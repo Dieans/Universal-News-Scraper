@@ -55,7 +55,7 @@ A powerful, terminal-based news aggregator that supports **RSS feeds**, **Web Sc
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/Universal-News-Scraper.git
+git clone https://github.com/Ilias1988/Universal-News-Scraper.git
 cd Universal-News-Scraper
 ```
 
